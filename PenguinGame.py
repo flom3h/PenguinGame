@@ -58,10 +58,10 @@ def blockmap(screen):
 
 def icecuberects(map_matrix, icecube_image, finish_image, blocksize, enemy_image):
   icecube_rects = []
-  enemy_start_x = 0
-  enemy_start_y = 0
-  enemy_end_x = 0
-  enemy_end_y = 0
+  enemy_start_x = -500
+  enemy_start_y = -500
+  enemy_end_x = -500
+  enemy_end_y = -500
   for row in range(len(map_matrix)):
     for col in range(len(map_matrix[row])):
       if map_matrix[row][col] == 1:
@@ -79,11 +79,7 @@ def icecuberects(map_matrix, icecube_image, finish_image, blocksize, enemy_image
       elif map_matrix[row][col] == 4:
         enemy_end_x = col * blocksize
         enemy_end_y = row * blocksize
-  try:
-      return icecube_rects, icecube_rect, finish_rect, enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y
-  except Exception as E:
-      print(E)
-      return icecube_rects, icecube_rect, finish_rect, 0, 0, 0, 0
+  return icecube_rects, icecube_rect, finish_rect, enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y
 
 def blitcubes(icecube_rects, screen, icecube_image, finish_image, finish_rect):
   for rect in icecube_rects:
