@@ -1,5 +1,5 @@
 import pygame
-import pygame_menu
+import sys
 map_image = pygame.image.load("PenguinGame/map.png")
 map_image = pygame.transform.scale(map_image, (640, 640))
 player_image = pygame.image.load("PenguinGame/penguin1.png")
@@ -36,8 +36,7 @@ def pygame_init():
   yplayer = 400
   blocksize = 80
   screen.fill("white")
-  font = pygame.font.Font(None, 36)
-  return screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize, font
+  return screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize
 
 def load_map(level):
     map_matrix = []
@@ -121,7 +120,7 @@ def movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, fini
     player_image = wimg
     collision = False
     if did_win == False:
-       direction_y = speed
+       direction_y = -speed
        direction_x = 0
     while collision == False:
       if player_rect.colliderect(finish_rect):
@@ -187,10 +186,10 @@ def movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, fini
 
   elif keys[pygame.K_a] and a:
     player_image = aimg
+    collision = False
     if did_win == False:
         direction_y = 0
         direction_x = -speed
-    collision = False
     while collision == False:
       if player_rect.colliderect(finish_rect):
           did_win = True
@@ -272,54 +271,75 @@ def blitlives (heart, deadheart, lives, screen):
   elif lives == 0:
      pygame.quit()
 
-def menu_screen(screen, font):
-   WHITE = (255, 255, 255)
-   BLACK = (0, 0, 0)
-
-   pass
-   
+def button(screen):
+  button_width = 200
+  button_height = 100
+  button_color = (255, 0, 0)
+  button_text = "Start"
+  button_font = pygame.font.Font(None, 36)
+  button_text_color = (255, 255, 255)
+  return button_width, button_height, button_color, button_text, button_font, button_text_color
 
 def main():
     direction_y = 0
     direction_x = 0
     lives = 3
     running = True
-    screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize, font = pygame_init()
+    screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize = pygame_init()
     icecube_image, finish_image = blockmap(screen)
+    button_width, button_height, button_color, button_text, button_font, button_text_color= button(screen)
+    did_win = False
+    player_speed = 40
+
     w = True
     a = True
     s = True
     d = True
     
-    did_win = False
-    player_speed = 40
-    for level in range(1,len(maps)):
-        map_matrix = load_map(level)
-        icecube_rects, icecube_rect, finish_rect = icecuberects(map_matrix, icecube_image, finish_image, blocksize)
-        draw_map(map_image, screen)
+    button_x = (screen.get_width() - button_width) // 2
+    button_y = (screen.get_height() - button_height) // 2
+    while running:
+       for event in pygame.event.get ():
+          if event.type == pygame.QUIT:
+             pygame.quit()
+          if event.type == pygame.MOUSEBUTTONDOWN:
+             mouse_pos = pygame.mouse.get_pos()
+             if button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height:
+                for level in range(1,len(maps)):
+                    map_matrix = load_map(level)
+                    icecube_rects, icecube_rect, finish_rect = icecuberects(map_matrix, icecube_image, finish_image, blocksize)
+                    draw_map(map_image, screen)
 
-        while running:
-          if did_win:
-              player_rect.x = 0
-              player_rect.y = 0
-              direction_x = 0
-              direction_y = 0
-              break
-          w, a, s, d, did_win, player_image, lives = movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, finish_image, did_win, player_rect, simg, dimg, aimg, direction_y, direction_x, player_speed, lives, heart, deadheart)
-          if lives == 0:
-              print("Lost")
-              pygame.quit()
+                    while running:
+                      if did_win:
+                          player_rect.x = 0
+                          player_rect.y = 0
+                          direction_x = 0
+                          direction_y = 0
+                          break
+                      w, a, s, d, did_win, player_image, lives = movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, finish_image, did_win, player_rect, simg, dimg, aimg, direction_y, direction_x, player_speed, lives, heart, deadheart)
+                      if lives == 0:
+                          print("Lost")
+                          pygame.quit()
 
-          blitlives(heart, deadheart, lives, screen)
-          blitcubes(icecube_rects, screen, icecube_image, finish_image, finish_rect)
-          screen.blit(player_image, (player_rect.x, player_rect.y))
-          screen_setup(screen)
-          pygame.display.update()
-        did_win = False
-        w = True
-        a = True
-        s = True
-        d = True
+                      blitlives(heart, deadheart, lives, screen)
+                      blitcubes(icecube_rects, screen, icecube_image, finish_image, finish_rect)
+                      screen.blit(player_image, (player_rect.x, player_rect.y))
+                      screen_setup(screen)
+                      pygame.display.update()
+                      if level > len(maps):
+                         pygame.quit()
+                    did_win = False
+                    w = True
+                    a = True
+                    s = True
+                    d = True
+       pygame.draw.rect(screen, button_color, (button_x, button_y, button_width, button_height))
+       text_surface = button_font.render(button_text, True, button_text_color)
+       text_rect = text_surface.get_rect(center= (button_x + button_width //2, button_y + button_height //2))
+       screen.blit(text_surface, text_rect)
+       pygame.display.flip()
+
         
 if __name__ == '__main__':
   main()
