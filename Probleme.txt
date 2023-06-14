@@ -1,0 +1,4 @@
+1. Eines der größten Probleme war das bewegen des Spielers bis er mit einem Stein kollidiert. -> Habs mit while schleifen gelöst was jedoch mehr probleme beschwört hat...
+2. Wenn sich der Player bewegt hat hat es alles andere nicht geblitet dh. wir mussten fast alle sprites und so in die movement funktion mitgeben und in der while schleife bliten.
+3. Ein großes problem war auch wenn man mit einem Eisberg kollidiert ist und stehen gebliben ist, nochmal in diese richtung gefahren ist, wurde man weiter in den stein befördert. -> mit Boolischen werten gelöst das man nur in eine richtung gehen konnte bis man eine andere benützt hat.
+4. Wenn man ein level geschafft hat, hat man die geschwindigkeit in das nächste mitgenommen und so fix ein Leben verloren. -> danach immer auf 0 setzten.
