@@ -14,6 +14,8 @@ dimg = pygame.transform.scale(dimg, (80,60))
 aimg = pygame.image.load("PenguinGame/penguina.png")
 aimg = pygame.transform.scale(aimg, (80,60))
 maps = [1,2,3,4,5,6,7,8,9,10,11]
+enemy_image = pygame.image.load("PenguinGame\eisbaer.png")
+enemy_image = pygame.transform.scale(enemy_image, (80,60))
 heart = pygame.image.load("PenguinGame/heart.png")
 heart == pygame.transform.scale(heart, (200, 200))
 deadheart = pygame.image.load("PenguinGame/deadheart.png")
@@ -54,8 +56,12 @@ def blockmap(screen):
 
   return icecube_image, finish_image
 
-def icecuberects(map_matrix, icecube_image, finish_image, blocksize):
+def icecuberects(map_matrix, icecube_image, finish_image, blocksize, enemy_image):
   icecube_rects = []
+  enemy_start_x = 0
+  enemy_start_y = 0
+  enemy_end_x = 0
+  enemy_end_y = 0
   for row in range(len(map_matrix)):
     for col in range(len(map_matrix[row])):
       if map_matrix[row][col] == 1:
@@ -67,8 +73,17 @@ def icecuberects(map_matrix, icecube_image, finish_image, blocksize):
         finish_rect = finish_image.get_rect()
         finish_rect.x = col * blocksize
         finish_rect.y = row * blocksize
-        
-  return icecube_rects, icecube_rect, finish_rect
+      elif map_matrix[row][col] == 3:
+        enemy_start_x = col * blocksize
+        enemy_start_y = row * blocksize
+      elif map_matrix[row][col] == 4:
+        enemy_end_x = col * blocksize
+        enemy_end_y = row * blocksize
+  try:
+      return icecube_rects, icecube_rect, finish_rect, enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y
+  except Exception as E:
+      print(E)
+      return icecube_rects, icecube_rect, finish_rect, 0, 0, 0, 0
 
 def blitcubes(icecube_rects, screen, icecube_image, finish_image, finish_rect):
   for rect in icecube_rects:
@@ -110,6 +125,22 @@ def check_in_screen(screen):
         player_rect.y = 0
         return False
     return True
+
+
+def move_enemy(enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y, enemy_rect, enemy_image, screen, going_to_start):
+    enemy_speed = 0.01
+    if enemy_rect.x == enemy_end_x and enemy_rect.y == enemy_end_y:
+        going_to_start = True
+    elif enemy_rect.x == enemy_start_x and enemy_rect.y == enemy_start_y:
+        going_to_start = False
+    if going_to_start == False:
+        enemy_rect.x += enemy_speed * ((enemy_end_x - enemy_start_x) * 1.2)
+        enemy_rect.y += enemy_speed * ((enemy_end_y - enemy_start_y) * 1.2)
+    else:
+        enemy_rect.x -= enemy_speed * ((enemy_end_x - enemy_start_x) * 1.2)
+        enemy_rect.y -= enemy_speed * ((enemy_end_y - enemy_start_y) * 1.2)
+    screen.blit(enemy_image, enemy_rect)
+    return going_to_start
 
 def movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, finish_image, did_win, player_rect, simg, dimg, aimg, direction_y, direction_x, player_speed, lives, heart, deadheart):
   speed = 40
@@ -288,6 +319,7 @@ def main():
     screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize = pygame_init()
     icecube_image, finish_image = blockmap(screen)
     button_width, button_height, button_color, button_text, button_font, button_text_color= button(screen)
+    enemy_rect = enemy_image.get_rect()
     did_win = False
     player_speed = 40
 
@@ -300,17 +332,25 @@ def main():
     button_y = (screen.get_height() - button_height) // 2
     while running:
        for event in pygame.event.get ():
-          if event.type == pygame.QUIT:
-             pygame.quit()
+          if event.type == pygame.KEYDOWN:
+             if pygame.K_ESCAPE:
+                pygame.quit()
           if event.type == pygame.MOUSEBUTTONDOWN:
              mouse_pos = pygame.mouse.get_pos()
              if button_x <= mouse_pos[0] <= button_x + button_width and button_y <= mouse_pos[1] <= button_y + button_height:
                 for level in range(1,len(maps)):
                     map_matrix = load_map(level)
-                    icecube_rects, icecube_rect, finish_rect = icecuberects(map_matrix, icecube_image, finish_image, blocksize)
+                    icecube_rects, icecube_rect, finish_rect, enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y = icecuberects(map_matrix, icecube_image, finish_image, blocksize, enemy_image)
                     draw_map(map_image, screen)
+                    enemy_rect.x = enemy_start_x
+                    enemy_rect.y = enemy_start_y
+                    going_to_start = True
 
                     while running:
+                      if level > len(maps):
+                         pygame.quit()
+                         break
+                      screen.blit(map_image, (0,0))
                       if did_win:
                           player_rect.x = 0
                           player_rect.y = 0
@@ -318,6 +358,7 @@ def main():
                           direction_y = 0
                           break
                       w, a, s, d, did_win, player_image, lives = movement(icecube_rects, w, a, s, d, screen, finish_rect, icecube_image, finish_image, did_win, player_rect, simg, dimg, aimg, direction_y, direction_x, player_speed, lives, heart, deadheart)
+                      going_to_start = move_enemy(enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y, enemy_rect, enemy_image, screen, going_to_start)
                       if lives == 0:
                           print("Lost")
                           pygame.quit()
@@ -327,8 +368,6 @@ def main():
                       screen.blit(player_image, (player_rect.x, player_rect.y))
                       screen_setup(screen)
                       pygame.display.update()
-                      if level > len(maps):
-                         pygame.quit()
                     did_win = False
                     w = True
                     a = True
