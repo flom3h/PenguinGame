@@ -1,5 +1,23 @@
+#! /C:/Program Files/Python311/
+""""! @brief Slider Game made with Pygame from Merlin Tschann and Florian Pieles"""
+
+""""
+@file
+@brief A Penguin slider game, made with python using the pygame library, from Merlin Tschann and Florian Pieles
+The Game is controlled by the keyboard, the goal of the game is to get the penguin through the levels without crashing into the polarbear or one of the walls
+"""
+
+##
+"""
+@mainpage Penguin slider game
+This is the documentation of the Penguin Slider Game
+"""
+
+#Import the required library (pygame)
 import pygame
-import sys
+
+# Load the pictures, scale the loaded assets
+#image of the map
 map_image = pygame.image.load("PenguinGame/map.png")
 map_image = pygame.transform.scale(map_image, (640, 640))
 player_image = pygame.image.load("PenguinGame/penguin1.png")
@@ -13,21 +31,43 @@ dimg = pygame.image.load("PenguinGame/penguind.png")
 dimg = pygame.transform.scale(dimg, (80,60))
 aimg = pygame.image.load("PenguinGame/penguina.png")
 aimg = pygame.transform.scale(aimg, (80,60))
-maps = [1,2,3,4,5,6,7,8,9,10,11]
 enemy_image = pygame.image.load("PenguinGame\eisbaer.png")
 enemy_image = pygame.transform.scale(enemy_image, (80,60))
 heart = pygame.image.load("PenguinGame/heart.png")
 heart == pygame.transform.scale(heart, (200, 200))
 deadheart = pygame.image.load("PenguinGame/deadheart.png")
 deadheart == pygame.transform.scale(deadheart, (2000, 2000))
+
+# Generate the maplist, used to load the maps and give the amount of maps used
+maps = [1,2,3,4,5,6,7,8,9,10,11]
+
+# initialize the music player, load the music
 pygame.mixer.init()
 pygame.mixer.music.load("si.mp3")
+
+# Make the music loop an unlimited amount of times
 pygame.mixer.music.play(-1)
 
-
-
 def pygame_init():
+  """!
+  Initialize the Pygame library and set up the game screen as well as basic variables
+  
+  @param screen The size of the game window
+  @param breite wideness of the screen
+  @param hoehe height of the screen
+  @param clock used to controll the frame rate and the time
+  @param frames framerate, used to controll the speed of the game (smoothness)
+  @param player_speed the speed at which the player (the penguin) moves
+  @param dt
+  @param xplayer position, where the player spawns at (x-axis)
+  @param yplayer position, where the player spawns at (y-axis)
+  @param blocksize size in pixels of the ice cubes
+  
+  @return screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize
+  """
+  #Initialize Pygame
   pygame.init()
+
   screen = pygame.display.set_mode((640, 640))
   breite, hoehe = screen.get_size()
   clock = pygame.time.Clock()
@@ -37,10 +77,17 @@ def pygame_init():
   xplayer = 400
   yplayer = 400
   blocksize = 80
+  #fill the screen white
   screen.fill("white")
   return screen, breite, hoehe, clock, frames, player_speed, dt, xplayer, yplayer, blocksize
 
 def load_map(level):
+    """!
+    Load the map, as well as the matrix, that is used as a base for the map (system like tilemap)
+    @param map_matrix contains the currently played map, various numbers are used to signal certain things (0 = nothing, 1 = Ice cube, 2 = Finish flag, 3 = Start of the route of the Enemy, 4 = End of the rout of the Enemy)
+    @param row a single row that is used to draw the screen
+    @return
+    """
     map_matrix = []
     with open(f"Maps/map{level}.txt", "r") as f:
         for line in f:
