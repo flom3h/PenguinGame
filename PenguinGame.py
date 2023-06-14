@@ -13,7 +13,7 @@ dimg = pygame.image.load("PenguinGame/penguind.png")
 dimg = pygame.transform.scale(dimg, (80,60))
 aimg = pygame.image.load("PenguinGame/penguina.png")
 aimg = pygame.transform.scale(aimg, (80,60))
-maps = [1,2,3,4,5,6,7,8,9,10,11]
+maps = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
 enemy_image = pygame.image.load("PenguinGame\eisbaer.png")
 enemy_image = pygame.transform.scale(enemy_image, (80,60))
 heart_width = 130
@@ -127,8 +127,8 @@ def check_in_screen(screen):
 
 
 def move_enemy(enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y, enemy_rect, enemy_image, screen, going_to_start):
-    i = 1.3
-    enemy_speed = 0.005
+    i = 1.2
+    enemy_speed = 0.01
     if enemy_rect.x == enemy_end_x and enemy_rect.y == enemy_end_y:
         going_to_start = True
     elif enemy_rect.x == enemy_start_x and enemy_rect.y == enemy_start_y:
@@ -143,7 +143,7 @@ def move_enemy(enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y, enemy_rec
     return going_to_start
 
 def movement(icecube_rects, w, a, s, d, finish_rect, icecube_image, finish_image, did_win, player_rect, simg, dimg, aimg, direction_y, direction_x, player_speed, lives, heart, deadheart, enemy_start_x, enemy_start_y, enemy_end_x, enemy_end_y, enemy_rect, enemy_image, screen, going_to_start):
-  speed = 10
+  speed = 20
   blocksize = 80
   keys = pygame.key.get_pressed()
   global player_image
